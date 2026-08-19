@@ -56,8 +56,33 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useTheme() {
+/**
+ * Reads the theme context. Falls back to a DOM-driven implementation when no
+ * provider is mounted (e.g. error/not-found shells) instead of crashing.
+ */
+export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
-  return ctx;
+  const [fallback, setFallback] = useState<Theme>("light");
+
+  useEffect(() => {
+    if (ctx) return;
+    setFallback(document.documentElement.classList.contains("dark") ? "dark" : "light");
+  }, [ctx]);
+
+  const setFallbackTheme = useCallback((next: Theme) => {
+    setFallback(next);
+    applyTheme(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+
+  if (ctx) return ctx;
+  return {
+    theme: fallback,
+    setTheme: setFallbackTheme,
+    toggleTheme: () => setFallbackTheme(fallback === "dark" ? "light" : "dark"),
+  };
 }
