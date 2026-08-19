@@ -1,5 +1,6 @@
-import { ArrowDownRight, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowDownRight, Download, Github, Linkedin, Mail } from "lucide-react";
 import portrait from "@/assets/portrait.jpg";
+import { siteConfig, trackEvent } from "@/lib/site";
 import { Reveal } from "./Reveal";
 
 const stats = [
@@ -22,7 +23,7 @@ export function Hero() {
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-6 text-4xl font-semibold leading-[1.05] sm:text-5xl lg:text-6xl">
-              Alex Moreau — web developer crafting fast, accessible products.
+              {siteConfig.name} — web developer crafting fast, accessible products.
             </h1>
           </Reveal>
           <Reveal delay={160}>
@@ -41,16 +42,19 @@ export function Hero() {
                 <ArrowDownRight className="size-4" />
               </a>
               <a
-                href="#contact"
+                href={siteConfig.resumeUrl}
+                download={siteConfig.resumeFileName}
+                onClick={() => trackEvent("resume_download", { location: "hero" })}
                 className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-secondary"
               >
-                Start a project
+                <Download className="size-4" />
+                Download résumé
               </a>
               <div className="flex items-center gap-1 pl-1">
                 {[
-                  { icon: Github, label: "GitHub", href: "https://github.com" },
-                  { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com" },
-                  { icon: Mail, label: "Email", href: "mailto:hello@alex.dev" },
+                  { icon: Github, label: "GitHub", href: siteConfig.social.github },
+                  { icon: Linkedin, label: "LinkedIn", href: siteConfig.social.linkedin },
+                  { icon: Mail, label: "Email", href: `mailto:${siteConfig.email}` },
                 ].map(({ icon: Icon, label, href }) => (
                   <a
                     key={label}
@@ -84,7 +88,7 @@ export function Hero() {
             <div className="absolute -inset-3 rounded-3xl bg-accent/60" aria-hidden="true" />
             <img
               src={portrait}
-              alt="Alex Moreau working at a desk"
+              alt={`${siteConfig.name} working at a desk`}
               width={1024}
               height={1280}
               className="relative aspect-[4/5] w-full rounded-2xl object-cover shadow-soft"
